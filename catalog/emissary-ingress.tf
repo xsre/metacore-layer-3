@@ -1,3 +1,9 @@
+resource "kubernetes_namespace" "emissary" {
+  metadata {
+    name = "emissary"
+  }
+}
+
 resource "null_resource" "emissary-crds" {
   provisioner "local-exec" {
     command = <<EOF
