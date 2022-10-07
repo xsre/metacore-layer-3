@@ -6,7 +6,7 @@ resource "helm_release" "cert-manager" {
   namespace  = "cert-manager"
 
   values = [
-    templatefile("${path.module}/values/cert-manager.tpl", {
+    templatefile("${path.module}/../../../env/${var.team}/${var.env}/${var.region}/${var.infra_id}/${var.cluster}/helm/cert-manager.tpl", {
       #domain_name             = var.domain_name
     })
   ]
