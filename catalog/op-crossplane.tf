@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "crossplane" {
 resource "helm_release" "crossplane" {
   repository = "https://charts.crossplane.io/stable"
   chart      = "crossplane"
-  version    = "1.9.1"  
+  version    = "1.9.0" # (7 Sep, 2022) 
   name       = "crossplane"
   namespace  = "crossplane"
 
@@ -70,7 +70,7 @@ resource "helm_release" "crossplane" {
   depends_on = [kubernetes_namespace.crossplane, aws_iam_role.crossplane-role]
 }
 
-resource "local_file" "crossplane-provider" {
+resource "local_file" "crossplane-controller" {
   content    = <<EOT
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
@@ -92,6 +92,22 @@ spec:
   package: crossplane/provider-aws:v0.31.0
   controllerConfigRef:
     name: aws-config
+EOT
+  filename = "${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane.yaml"
+
+  depends_on = [helm_release.crossplane]
+}
+
+resource "null_resource" "crossplane-controller" {
+  provisioner "local-exec" {
+    command = "kubectl apply -f ${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane.yaml"
+  }
+
+  depends_on = [local_file.crossplane-controller]
+}
+
+resource "local_file" "crossplane-provider" {
+  content    = <<EOT
 ---
 apiVersion: aws.crossplane.io/v1beta1
 kind: ProviderConfig
@@ -101,15 +117,15 @@ spec:
   credentials:
     source: InjectedIdentity
 EOT
-  filename = "${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane.yaml"
+  filename = "${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane-provider.yaml"
 
   depends_on = [helm_release.crossplane]
 }
 
-resource "null_resource" "crossplane-provider" {
-  provisioner "local-exec" {
-    command = "kubectl apply -f ${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane.yaml"
-  }
-
-  depends_on = [local_file.crossplane-provider]
-}
+#resource "null_resource" "crossplane-provider" {
+#  provisioner "local-exec" {
+#    command = "kubectl apply -f ${path.module}/../../../../env/${var.team}/${var.env}/${var.zone}/${var.infra_id}/${var.cluster}/crossplane-provider.yaml"
+#  }
+#
+#  depends_on = [local_file.crossplane-provider]
+#}
