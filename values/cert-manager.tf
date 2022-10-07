@@ -1,7 +1,8 @@
+
 resource "helm_release" "cert-manager" {
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.9.1"
+  version    = "v1.9.1" # (26 Jul, 2022)
   name       = "cert-manager"
   namespace  = "cert-manager"
 

@@ -75,7 +75,7 @@ resource "helm_release" "logs" {
   namespace  = kubernetes_namespace.logs.id
 
   values = [
-    templatefile("${path.module}/../../../env/${var.team}/${var.env}/${var.region}/${var.infra_id}/${var.cluster}/helm/aws-fluentbit.tpl", {
+    templatefile("${path.module}/values/aws-fluentbit.tpl", {
       logGroupName = "${local.cluster_name}-fluentbit"
       region       = var.region
     })
