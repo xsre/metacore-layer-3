@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "crossplane" {
 resource "helm_release" "crossplane" {
   repository = "https://charts.crossplane.io/stable"
   chart      = "crossplane"
-  version    = "1.9.0" # (7 Sep, 2022) 
+  version    = "1.9.1"  
   name       = "crossplane"
   namespace  = "crossplane"
 
@@ -89,7 +89,7 @@ kind: Provider
 metadata:
   name: provider-aws
 spec:
-  package: crossplane/provider-aws:v0.27.0
+  package: crossplane/provider-aws:v0.31.0
   controllerConfigRef:
     name: aws-config
 ---
